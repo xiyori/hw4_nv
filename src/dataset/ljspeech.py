@@ -4,10 +4,12 @@ import torch.nn.functional as F
 
 from torch import Tensor
 from torch.utils.data import Dataset
+from typing import Sequence
 
 
 class LJSpeechDataset(Dataset):
-    def __init__(self, config, mel_config, file_list_path, validation = False):
+    def __init__(self, config, mel_config, file_list,
+                 validation = False, augmentations = None):
         self.wav_dir = config.wav_dir
         self.wav_scale = config.wav_scale
         self.segment_size = config.segment_size
@@ -16,14 +18,20 @@ class LJSpeechDataset(Dataset):
         self.hop_length = mel_config.hop_length
         self.padding = (mel_config.num_fft - mel_config.hop_length) // 2
 
-        self.file_list_path = file_list_path
+        self.file_list = file_list
         self.validation = validation
+        self.augmentations = augmentations
 
-        self.ids = []
-        with open(file_list_path, "r") as f:
-            for line in f:
-                name = line[:line.index("|")].strip()
-                self.ids += [f"{self.wav_dir}/{name}.wav"]
+        if isinstance(file_list, str):
+            self.ids = []
+            with open(file_list, "r") as f:
+                for line in f:
+                    name = line[:line.index("|")].strip()
+                    self.ids += [f"{self.wav_dir}/{name}.wav"]
+        elif isinstance(file_list, Sequence):
+            self.ids = [f"{self.wav_dir}/{name}" for name in file_list]
+        else:
+            raise ValueError(f"file list of type '{type(file_list)}' not supported")
 
     def __getitem__(self, i: int) -> Tensor:
         audio, sample_rate = torchaudio.load(self.ids[i])
@@ -38,6 +46,9 @@ class LJSpeechDataset(Dataset):
             else:
                 # I'm almost 100% sure this is never used
                 audio = F.pad(audio, (0, self.segment_size - audio.shape[1]), "constant")
+
+        if self.augmentations is not None:
+            audio = self.augmentations(audio)
 
         return audio
 
