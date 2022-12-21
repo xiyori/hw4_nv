@@ -1,4 +1,3 @@
-import torch
 import torch.nn.functional as F
 
 from torch import nn, Tensor
@@ -9,20 +8,23 @@ from .utils import conv_hook
 
 
 class PeriodDiscriminator(nn.Module):
-    def __init__(self, period, kernel_size = 5, stride = 3,
+    def __init__(self, period, channels, kernel_size = 5, stride = 3,
                  use_spectral_norm = False, lrelu_slope = 0.1):
         super().__init__()
         self.period = period
         self.lrelu_slope = lrelu_slope
 
-        self.convs = nn.ModuleList([
-            nn.Conv2d(1, 32, (kernel_size, 1), (stride, 1), padding=(kernel_size // 2, 0)),
-            nn.Conv2d(32, 128, (kernel_size, 1), (stride, 1), padding=(kernel_size // 2, 0)),
-            nn.Conv2d(128, 512, (kernel_size, 1), (stride, 1), padding=(kernel_size // 2, 0)),
-            nn.Conv2d(512, 1024, (kernel_size, 1), (stride, 1), padding=(kernel_size // 2, 0)),
-            nn.Conv2d(1024, 1024, (kernel_size, 1), padding=(kernel_size // 2, 0)),
-        ])
-        self.out_conv = nn.Conv2d(1024, 1, kernel_size=(3, 1), padding=(3 // 2, 0))
+        convs = []
+        for i in range(len(channels) - 2):
+            convs += [nn.Conv2d(channels[i], channels[i + 1],
+                                (kernel_size, 1), (stride, 1),
+                                padding=(kernel_size // 2, 0))]
+        convs += [nn.Conv2d(channels[-2], channels[-1],
+                            (kernel_size, 1),
+                            padding=(kernel_size // 2, 0))]
+        self.convs = nn.ModuleList(convs)
+
+        self.out_conv = nn.Conv2d(channels[-1], 1, kernel_size=(3, 1), padding=(3 // 2, 0))
 
         norm = spectral_norm if use_spectral_norm else weight_norm
         self.apply(conv_hook(norm))
@@ -52,6 +54,7 @@ class MultiPeriodDiscriminator(nn.Module):
         super().__init__()
 
         discriminators = [PeriodDiscriminator(period,
+                                              config.mpd_channels,
                                               config.mpd_kernel_size,
                                               config.mpd_stride,
                                               config.mpd_use_spectral_norm,

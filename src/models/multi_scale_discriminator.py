@@ -1,4 +1,3 @@
-import torch
 import torch.nn.functional as F
 
 from torch import nn, Tensor
@@ -9,20 +8,19 @@ from .utils import conv_hook
 
 
 class ScaleDiscriminator(nn.Module):
-    def __init__(self, use_spectral_norm = False, lrelu_slope = 0.1):
+    def __init__(self, channels, kernel_sizes, strides, groups,
+                 use_spectral_norm = False, lrelu_slope = 0.1):
         super().__init__()
         self.lrelu_slope = lrelu_slope
 
-        self.convs = nn.ModuleList([
-            nn.Conv1d(1, 128, kernel_size=15, stride=1, padding=15 // 2),
-            nn.Conv1d(128, 128, kernel_size=41, stride=2, groups=4, padding=41 // 2),
-            nn.Conv1d(128, 256, kernel_size=41, stride=2, groups=16, padding=41 // 2),
-            nn.Conv1d(256, 512, kernel_size=41, stride=4, groups=16, padding=41 // 2),
-            nn.Conv1d(512, 1024, kernel_size=41, stride=4, groups=16, padding=41 // 2),
-            nn.Conv1d(1024, 1024, kernel_size=41, stride=1, groups=16, padding=41 // 2),
-            nn.Conv1d(1024, 1024, kernel_size=5, stride=1, padding=5 // 2)
-        ])
-        self.out_conv = nn.Conv1d(1024, 1, kernel_size=3, padding=3 // 2)
+        convs = []
+        for i in range(len(channels) - 1):
+            convs += [nn.Conv1d(channels[i], channels[i + 1],
+                                kernel_sizes[i], strides[i],
+                                groups=groups[i],
+                                padding=kernel_sizes[i] // 2)]
+        self.convs = nn.ModuleList(convs)
+        self.out_conv = nn.Conv1d(channels[-1], 1, kernel_size=3, padding=3 // 2)
 
         norm = spectral_norm if use_spectral_norm else weight_norm
         self.apply(conv_hook(norm))
@@ -44,10 +42,11 @@ class MultiScaleDiscriminator(nn.Module):
     def __init__(self, config):
         super().__init__()
 
+        args = [config.msd_channels, config.msd_kernel_sizes, config.msd_strides, config.msd_groups]
         self.discriminators = nn.ModuleList([
-            ScaleDiscriminator(use_spectral_norm=True, lrelu_slope=config.lrelu_slope),
-            ScaleDiscriminator(lrelu_slope=config.lrelu_slope),
-            ScaleDiscriminator(lrelu_slope=config.lrelu_slope),
+            ScaleDiscriminator(*args, use_spectral_norm=True, lrelu_slope=config.lrelu_slope),
+            ScaleDiscriminator(*args, lrelu_slope=config.lrelu_slope),
+            ScaleDiscriminator(*args, lrelu_slope=config.lrelu_slope),
         ])
         self.avgpools = nn.ModuleList([
             nn.AvgPool1d(kernel_size=4, stride=2, padding=2),

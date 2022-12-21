@@ -9,7 +9,8 @@ from torch.optim.lr_scheduler import ExponentialLR
 from torchmetrics import PeakSignalNoiseRatio, StructuralSimilarityIndexMeasure
 from typing import Optional, Dict, Tuple
 
-from ..dataset import LJSpeechDataset, MelSpectrogram
+from ..dataset import LJSpeechDataset
+from ..transforms import MelSpectrogram
 from ..models import Generator, Discriminator, init_weights
 from ..loss import KeySelector, FeatureLoss, GeneratorLoss, DiscriminatorLoss
 
@@ -40,8 +41,8 @@ class MelConfig:
 
 @dataclass
 class DataConfig:
-    # data_dir = "C:/data/LJSpeech-1.1"
-    data_dir = "/home/jupyter/mnt/datasets/LJSpeech-1.1"
+    data_dir = "C:/data/LJSpeech-1.1"
+    # data_dir = "/home/jupyter/mnt/datasets/LJSpeech-1.1"
     wav_dir = data_dir + "/wavs"
     train_file_list = data_dir + "/training.txt"
     valid_file_list = data_dir + "/validation.txt"
@@ -74,10 +75,18 @@ class ModelConfig:
     resblock_kernel_sizes = [3, 7, 11]
     resblock_dilation_sizes = [[1, 3, 5], [1, 3, 5], [1, 3, 5]]
 
+    # Parameters from the official implementation
     mpd_periods = [2, 3, 5, 7, 11]
+    mpd_channels = [1, 32, 128, 512, 1024, 1024]
     mpd_kernel_size = 5
     mpd_stride = 3
     mpd_use_spectral_norm = False
+
+    # Parameters from the official implementation
+    msd_channels = [1, 128, 128, 256, 512, 1024, 1024, 1024]
+    msd_kernel_sizes = [15, 41, 41, 41, 41, 41, 5]
+    msd_strides = [1, 2, 2, 4, 4, 1, 1]
+    msd_groups = [1, 4, 16, 16, 16, 16, 1]
 
     @property
     def generator(self) -> nn.Module:
@@ -100,7 +109,7 @@ class TrainConfig:
 
     num_epochs = 3100
 
-    train_batch = 1
+    train_batch = 16
     valid_batch = 1
 
     train_num_workers = 0

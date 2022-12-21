@@ -23,11 +23,11 @@ class ResBlockType1(nn.Module):
         ])
 
     def forward(self, x: Tensor) -> Tensor:
-        for c1, c2 in zip(self.convs1, self.convs2):
+        for conv1, conv2 in zip(self.convs1, self.convs2):
             xt = F.leaky_relu(x, self.lrelu_slope)
-            xt = c1(xt)
+            xt = conv1(xt)
             xt = F.leaky_relu(xt, self.lrelu_slope)
-            xt = c2(xt)
+            xt = conv2(xt)
             x = xt + x
         return x
 
@@ -44,9 +44,9 @@ class ResBlockType2(nn.Module):
         ])
 
     def forward(self, x: Tensor) -> Tensor:
-        for c in self.convs:
+        for conv in self.convs:
             xt = F.leaky_relu(x, self.lrelu_slope)
-            xt = c(xt)
+            xt = conv(xt)
             x = xt + x
         return x
 
