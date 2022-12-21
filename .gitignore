@@ -1,0 +1,8 @@
+.idea
+*.iml
+.ipynb_checkpoints
+/*.txt
+/resources
+/output
+/wandb
+__*__
