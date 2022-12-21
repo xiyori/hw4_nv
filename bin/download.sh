@@ -14,10 +14,10 @@ mv training.txt "$1"
 mv validation.txt "$1"
 
 #download checkpoint
-#gdown https://drive.google.com/u/0/uc?id=1VVyVwQxDtKyWCvpMgI069V5tZJRIuKAO
-#mv final_model.pth.tar "$2"
-#
-##download results
-#gdown https://drive.google.com/u/0/uc?id=1YusPal6ao80Ou8sRSNZSEAljOA7gmMSc
-#unzip final_model.zip >> /dev/null
-#mv final_model "$3/final_model"
+gdown https://drive.google.com/u/0/uc?id=12WleeyYBxTWAJHJtlb5fC-XvRQmid57B
+mv v1_l1mel45_genlr0.0002_dislr0.0002_batch16_epoch8.pth "$2/../models"
+
+#download results
+gdown https://drive.google.com/u/0/uc?id=1Ej-N42vodpVAYFXQ8RX5yDSVF1D8qsVg
+unzip v1_l1mel45_genlr0.0002_dislr0.0002_batch16_epoch8.zip >> /dev/null
+mv v1_l1mel45_genlr0.0002_dislr0.0002_batch16_epoch8 "$3"
