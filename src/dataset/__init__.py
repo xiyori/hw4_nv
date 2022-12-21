@@ -1,2 +1,2 @@
 from .ljspeech import LJSpeechDataset
-# from .mel import MelDataset
+from .mel import MelDataset
