@@ -88,12 +88,12 @@ def train(config, mel_spectrogram, mel_spectrogram_loss, train_loader, valid_loa
 
         for target_audio in train_iter:
             target_audio = target_audio.to(config.device)
-            input_mel = mel_spectrogram(target_audio.squeeze(1))
-            target_mel = mel_spectrogram_loss(target_audio.squeeze(1))
+            input_mel = mel_spectrogram(target_audio)
+            target_mel = mel_spectrogram_loss(target_audio)
 
             # Get generator predictions
             pred_audio = generator(input_mel)
-            pred_mel = mel_spectrogram_loss(pred_audio.squeeze(1))
+            pred_mel = mel_spectrogram_loss(pred_audio)
 
             # Pad targets to match predictions from generator
             # target_audio = pad_to_length(target_audio, pred_audio.shape[-1])
@@ -177,12 +177,12 @@ def train(config, mel_spectrogram, mel_spectrogram_loss, train_loader, valid_loa
         with torch.no_grad():
             for target_audio in valid_iter:
                 target_audio = target_audio.to(config.device)
-                input_mel = mel_spectrogram(target_audio.squeeze(1))
-                target_mel = mel_spectrogram_loss(target_audio.squeeze(1))
+                input_mel = mel_spectrogram(target_audio)
+                target_mel = mel_spectrogram_loss(target_audio)
 
                 # Get generator predictions
                 pred_audio = generator(input_mel)
-                pred_mel = mel_spectrogram_loss(pred_audio.squeeze(1))
+                pred_mel = mel_spectrogram_loss(pred_audio)
 
                 # Pad targets to match predictions from generator
                 # target_audio = pad_to_length(target_audio, pred_audio.shape[-1])

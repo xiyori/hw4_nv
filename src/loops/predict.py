@@ -25,7 +25,7 @@ def predict(mel_spectrogram, model, data_loader,
     for audio in tqdm(data_loader, desc="Predict"):
         audio = audio.to(device)
         if mode == "audio":
-            input_mel = mel_spectrogram(audio.squeeze(1))
+            input_mel = mel_spectrogram(audio)
         else:
             input_mel = audio
         with torch.no_grad():

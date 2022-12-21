@@ -40,11 +40,13 @@ class MelSpectrogram(nn.Module):
 
     def forward(self, audio: Tensor) -> Tensor:
         """
-        :param audio: Expected shape is [B, T]
+        :param audio: Expected shape is [B, 1, T]
         :return: Shape is [B, n_mels, T']
         """
 
+        # This is effectively the same fix, just a bit prettier
         audio = F.pad(audio, (self.padding, self.padding), mode='reflect')
+        audio = audio.squeeze(1)
 
         mel = self.mel_spectrogram(audio) \
             .clamp_(min=1e-5) \
