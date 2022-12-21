@@ -1,6 +1,7 @@
+import librosa
 import torch
 import torchaudio
-import librosa
+import torch.nn.functional as F
 
 from torch import nn, Tensor
 
@@ -10,6 +11,7 @@ class MelSpectrogram(nn.Module):
         super().__init__()
         self.config = config
         self.sample_rate = config.sample_rate
+        self.padding = (config.num_fft - config.hop_length) // 2
 
         self.mel_spectrogram = torchaudio.transforms.MelSpectrogram(
             sample_rate=config.sample_rate,
@@ -18,7 +20,8 @@ class MelSpectrogram(nn.Module):
             n_fft=config.num_fft,
             f_min=config.f_min,
             f_max=config.f_max_loss if loss else config.f_max,
-            n_mels=config.num_mels
+            n_mels=config.num_mels,
+            center=False
         )
 
         # The is no way to set power in constructor in 0.5.0 version.
@@ -40,6 +43,8 @@ class MelSpectrogram(nn.Module):
         :param audio: Expected shape is [B, T]
         :return: Shape is [B, n_mels, T']
         """
+
+        audio = F.pad(audio, (self.padding, self.padding), mode='reflect')
 
         mel = self.mel_spectrogram(audio) \
             .clamp_(min=1e-5) \
