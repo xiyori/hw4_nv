@@ -1,43 +1,37 @@
 import torch
 
-from typing import Sequence
 from tqdm.auto import tqdm
 
 
-def predict(model, data_loader, device = "cuda:0", post_process = None):
+def predict(mel_spectrogram, model, data_loader,
+            device = "cuda:0", mode = "audio"):
     """
     Run model on data and collect predictions.
 
     Args:
+        mel_spectrogram (MelSpectrogram): mel spectrogram transform
         model (torch.nn.Module): model to be tested
         data_loader (torch.utils.data.Dataloader): dataloader with predict set
         device (torch.device): device to train on
+        mode (str): {"audio", "mels"} data mode
 
     Returns:
-        predicted betas
+        predicted audios
     """
 
     preds = []
-    ppreds = []
 
     model.eval()
-    for pair in tqdm(data_loader, desc="Predict"):
-        if isinstance(pair, Sequence):
-            input, target = pair
+    for audio in tqdm(data_loader, desc="Predict"):
+        audio = audio.to(device)
+        if mode == "audio":
+            input_mel = mel_spectrogram(audio.squeeze(1))
         else:
-            input = pair
-        input = input.to(device)
+            input_mel = audio
         with torch.no_grad():
-            pred = model(input)
+            pred = model(input_mel)
 
         preds += [pred.cpu()]
 
-        if post_process is not None:
-            ppred = post_process(input, pred)
-            ppreds += [ppred.cpu()]
-
-    preds = torch.cat(preds, dim=0)
-    if post_process is not None:
-        ppreds = torch.cat(ppreds, dim=0)
-        return preds, ppreds
+    # preds = torch.cat(preds, dim=0)
     return preds
