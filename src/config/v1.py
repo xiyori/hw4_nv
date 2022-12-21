@@ -41,8 +41,8 @@ class MelConfig:
 
 @dataclass
 class DataConfig:
-    data_dir = "C:/data/LJSpeech-1.1"
-    # data_dir = "/home/jupyter/mnt/datasets/LJSpeech-1.1"
+    # data_dir = "C:/data/LJSpeech-1.1"
+    data_dir = "/home/jupyter/mnt/datasets/LJSpeech-1.1"
     wav_dir = data_dir + "/wavs"
     train_file_list = data_dir + "/training.txt"
     valid_file_list = data_dir + "/validation.txt"
@@ -112,7 +112,7 @@ class TrainConfig:
     train_batch = 16
     valid_batch = 1
 
-    train_num_workers = 0
+    train_num_workers = 4
     valid_num_workers = 0
 
     l1_mel_coef = 45
