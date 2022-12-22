@@ -34,8 +34,8 @@ def main():
         data_config.wav_dir = args.data_dir
         data_config.valid_file_list = os.listdir(args.data_dir)
         dataset = data_config.valid_dataset
-        if args.shift != 0:
-            dataset.augmentations = PitchShift(mel_config.sample_rate, args.shift)
+        if args.pitch != 0:
+            dataset.augmentations = PitchShift(mel_config.sample_rate, args.pitch)
     else:
         dataset = MelDataset(args.data_dir)
 
@@ -77,7 +77,7 @@ def parse_args():
                         help="Pretrained generator weights (default: %(default)s).")
     parser.add_argument("-m", "--mode", type=str, choices=["audio", "mels"], default="audio",
                         help="Type of input data (default: %(default)s).")
-    parser.add_argument("--shift", type=float, default=0,
+    parser.add_argument("--pitch", type=float, default=0,
                         help="Audio pitch shift factor (default: %(default)s).")
     return parser.parse_args()
 
