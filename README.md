@@ -1,12 +1,12 @@
 # Homework 4 (NV)
 
+NV homework repository of HSE DLA course. The goal of the project is to implement HiFi-GAN model and train it on LJ-Speech dataset.
+
 ## Task
 This homework is aimed at implementing [HiFiGAN](https://arxiv.org/pdf/2010.05646.pdf) vocoder.
 We understand that anyone can find the authors' source code, but please don't write it off mindlessly. (At least the reviewer will see it and penalize you)
 
 Use dataset [LJSpeech](https://keithito.com/LJ-Speech-Dataset/) you already know.
-
-NV homework repository of HSE DLA course. The goal of the project is to implement HiFi-GAN model and train it on LJ-Speech dataset.
 
 ### Installation
 
@@ -20,7 +20,7 @@ Download all needed resources (data, checkpoints & inference examples) with
 
 `python3 bin/download.py`
 
-If you use Yandex DataSphere, specify the option
+If you wish to create a Yandex DataSphere Dataset, specify the option
 
 `python3 bin/download.py -d`
 
@@ -31,8 +31,6 @@ If you use Yandex DataSphere, specify the option
 Once the resources are ready, start the training with
 
 `python3 train.py`
-
-for DataSphere `g1.1` configuration.
 
 ### Generating test audio
 
