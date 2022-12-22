@@ -95,9 +95,9 @@ def train(config, mel_spectrogram, mel_spectrogram_loss, train_loader, valid_loa
             pred_audio = generator(input_mel)
             pred_mel = mel_spectrogram_loss(pred_audio)
 
-            # Pad targets to match predictions from generator
-            # target_audio = pad_to_length(target_audio, pred_audio.shape[-1])
-            # target_mel = pad_to_length(target_mel, pred_mel.shape[-1])
+            # Pad predictions from generator to match targets
+            pred_audio = pad_to_length(pred_audio, target_audio.shape[-1])
+            pred_mel = pad_to_length(pred_mel, target_mel.shape[-1])
 
             # Discriminator step
             dis_optimizer.zero_grad()
@@ -184,9 +184,9 @@ def train(config, mel_spectrogram, mel_spectrogram_loss, train_loader, valid_loa
                 pred_audio = generator(input_mel)
                 pred_mel = mel_spectrogram_loss(pred_audio)
 
-                # Pad targets to match predictions from generator
-                # target_audio = pad_to_length(target_audio, pred_audio.shape[-1])
-                # target_mel = pad_to_length(target_mel, pred_mel.shape[-1])
+                # Pad predictions from generator to match targets
+                pred_audio = pad_to_length(pred_audio, target_audio.shape[-1])
+                pred_mel = pad_to_length(pred_mel, target_mel.shape[-1])
 
                 # Get discriminator predictions
                 dis_out = discriminator(target_audio, pred_audio.detach())
