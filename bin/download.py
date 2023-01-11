@@ -33,5 +33,5 @@ os.makedirs(checkpoint_path, exist_ok=True)
 os.makedirs(results_path, exist_ok=True)
 os.chdir("./resources")
 
-subprocess.run(["bin/download.sh", data_dir,
+subprocess.run(["../bin/download.sh", data_dir,
                 checkpoint_path, results_path], env=env)
