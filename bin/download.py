@@ -25,6 +25,8 @@ data_dir = data_config.data_dir
 if args.datasphere:
     env["PATH"] += ":/home/jupyter/.local/bin"
     data_dir = "./resources/" + os.path.basename(data_dir)
+else:
+    os.makedirs(data_dir, exist_ok=True)
 
 data_dir = os.path.abspath(data_dir)
 checkpoint_path = os.path.abspath("./resources/chkpoints")

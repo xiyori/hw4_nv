@@ -42,7 +42,7 @@ class MelConfig:
 @dataclass
 class DataConfig:
     # data_dir = "C:/data/LJSpeech-1.1"
-    data_dir = "/home/jupyter/mnt/datasets/LJSpeech-1.1"
+    data_dir = "./data/LJSpeech-1.1"
     wav_dir = data_dir + "/wavs"
     train_file_list = data_dir + "/training.txt"
     valid_file_list = data_dir + "/validation.txt"
